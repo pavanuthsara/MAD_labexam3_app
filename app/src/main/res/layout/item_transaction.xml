@@ -11,12 +11,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:background="#081523"
         android:padding="16dp">
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="#1e2f39"
             android:orientation="vertical">
 
             <TextView
@@ -53,8 +55,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:background="#1e2f39"
             android:padding="8dp"
+
             android:src="@android:drawable/ic_menu_edit" />
 
         <ImageButton
@@ -62,8 +65,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="8dp"
+            android:background="#1e2f39"
             android:src="@android:drawable/ic_menu_delete" />
 
     </LinearLayout>
