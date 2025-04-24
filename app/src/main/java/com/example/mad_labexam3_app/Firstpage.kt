@@ -6,14 +6,13 @@ import android.os.Handler
 import android.os.Looper
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import com.example.mad_labexam3_app.Onbording1
 import com.example.mad_labexam3_app.R
 
-class MainActivity : AppCompatActivity() {
+class Firstpage : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.firstpage)
 
         // Use Handler to delay the screen transition
         Handler(Looper.getMainLooper()).postDelayed({

@@ -15,7 +15,7 @@
         android:theme="@style/Theme.MAD_labexam3_app"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name="com.example.madnew.Firstpage"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,6 +23,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".MainActivity"/>
+        <activity android:name="com.example.madnew.Onbording1"/>
+        <activity android:name="com.example.madnew.Onbording2"/>
+        <activity android:name="com.example.madnew.Onbording3"/>
         <activity
             android:name=".TransactionsActivity"
             android:exported="false" />
