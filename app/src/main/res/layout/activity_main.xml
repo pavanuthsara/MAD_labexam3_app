@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="#081523">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/summaryCard"
@@ -20,6 +21,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="#000000"
+            android:backgroundTint="#1e2f39"
             android:orientation="vertical"
             android:padding="16dp">
 
@@ -27,7 +30,9 @@
                 android:id="@+id/balanceText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:backgroundTint="#1e2f39"
                 android:text="Balance: LKR 0.00"
+                android:textColor="#FFFFFF"
                 android:textAlignment="center"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -71,6 +76,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="#1e2f39"
+            android:backgroundTint="#1e2f39"
             android:orientation="vertical"
             android:padding="8dp">
 
@@ -79,6 +86,7 @@
                 android:layout_height="wrap_content"
                 android:text="Expense Distribution"
                 android:textAlignment="center"
+                android:textColor="#FFFFFF"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -86,7 +94,9 @@
                 android:id="@+id/pieChart"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_margin="8dp" />
+                android:layout_margin="8dp"
+                android:background="#1E2F39"
+                android:backgroundTint="#1e2f39" />
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
@@ -97,6 +107,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:text="Add Income"
+        android:backgroundTint="#4571fe"
         app:layout_constraintBottom_toTopOf="@id/viewTransactionsButton"
         app:layout_constraintEnd_toStartOf="@+id/addExpenseButton"
         app:layout_constraintStart_toStartOf="parent" />
@@ -107,6 +118,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="Add Expense"
+        android:backgroundTint="#4571fe"
         app:layout_constraintBottom_toTopOf="@id/viewTransactionsButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/addIncomeButton" />
@@ -117,6 +129,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="View Transactions"
+        android:backgroundTint="#4571fe"
         app:layout_constraintBottom_toTopOf="@id/settingsButton" />
 
     <com.google.android.material.button.MaterialButton
@@ -126,6 +139,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="16dp"
         android:text="Settings"
+        android:backgroundTint="#4571fe"
         app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
