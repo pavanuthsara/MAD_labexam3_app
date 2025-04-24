@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Spinner
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -47,6 +48,7 @@ class TransactionsActivity : AppCompatActivity() {
                     .setPositiveButton("Delete") { _, _ ->
                         transactionManager.deleteTransaction(transaction.id)
                         updateTransactions()
+                        Toast.makeText(this, "Transaction deleted", Toast.LENGTH_SHORT).show()
                     }
                     .setNegativeButton("Cancel", null)
                     .show()
@@ -90,6 +92,10 @@ class TransactionsActivity : AppCompatActivity() {
                 this,
                 { _, year, month, day ->
                     calendar.set(year, month, day)
+                    if (calendar.time.after(Date())) {
+                        Toast.makeText(this, "Future dates are not allowed", Toast.LENGTH_SHORT).show()
+                        return@DatePickerDialog
+                    }
                     selectedDate = calendar.time
                     dateEdit.setText(dateFormat.format(selectedDate))
                 },
@@ -99,23 +105,55 @@ class TransactionsActivity : AppCompatActivity() {
             ).show()
         }
 
-        AlertDialog.Builder(this)
+        val dialog = AlertDialog.Builder(this)
             .setTitle("Edit Transaction")
             .setView(dialogView)
-            .setPositiveButton("Save") { _, _ ->
+            .setPositiveButton("Save", null)
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        dialog.setOnShowListener {
+            val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            positiveButton.setOnClickListener {
+                if (titleEdit.text.toString().trim().isEmpty()) {
+                    titleEdit.error = "Title is required"
+                    return@setOnClickListener
+                }
+
+                val amountStr = amountEdit.text.toString()
+                val amount = amountStr.toDoubleOrNull()
+                when {
+                    amountStr.isEmpty() -> {
+                        amountEdit.error = "Amount is required"
+                        return@setOnClickListener
+                    }
+                    amount == null -> {
+                        amountEdit.error = "Invalid amount format"
+                        return@setOnClickListener
+                    }
+                    amount <= 0 -> {
+                        amountEdit.error = "Amount must be greater than 0"
+                        return@setOnClickListener
+                    }
+                }
+
                 val updatedTransaction = transaction.copy(
-                    title = titleEdit.text.toString(),
-                    amount = amountEdit.text.toString().toDoubleOrNull() ?: 0.0,
+                    title = titleEdit.text.toString().trim(),
+                    amount = amount,
                     date = selectedDate,
                     category = if (transaction.type == TransactionType.EXPENSE)
                         ExpenseCategory.values()[categorySpinner.selectedItemPosition]
                     else null
                 )
+
                 transactionManager.updateTransaction(updatedTransaction)
                 updateTransactions()
+                Toast.makeText(this, "Transaction updated", Toast.LENGTH_SHORT).show()
+                dialog.dismiss()
             }
-            .setNegativeButton("Cancel", null)
-            .show()
+        }
+
+        dialog.show()
     }
 
     private fun updateTransactions() {

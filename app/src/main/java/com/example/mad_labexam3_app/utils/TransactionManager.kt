@@ -2,67 +2,127 @@ package com.example.mad_labexam3_app.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.example.mad_labexam3_app.models.ExpenseCategory
 import com.example.mad_labexam3_app.models.Transaction
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import com.example.mad_labexam3_app.models.TransactionType
+import org.json.JSONArray
+import org.json.JSONObject
+import java.util.*
 
-class TransactionManager(context: Context) {
-    private val sharedPreferences: SharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-    private val gson = Gson()
+class TransactionManager(private val context: Context) {
+    private val sharedPreferences: SharedPreferences = context.getSharedPreferences(
+        "expense_tracker_prefs",
+        Context.MODE_PRIVATE
+    )
 
-    companion object {
-        private const val PREF_NAME = "TransactionPrefs"
-        private const val KEY_TRANSACTIONS = "transactions"
-        private const val KEY_CURRENCY = "currency"
-        private const val KEY_BUDGET = "budget"
-        private const val DEFAULT_CURRENCY = "LKR"
+    fun getSharedPreferences(): SharedPreferences {
+        return sharedPreferences
     }
 
     fun saveTransaction(transaction: Transaction) {
         val transactions = getAllTransactions().toMutableList()
         transactions.add(transaction)
-        saveAllTransactions(transactions)
-    }
-
-    fun updateTransaction(transaction: Transaction) {
-        val transactions = getAllTransactions().toMutableList()
-        val index = transactions.indexOfFirst { it.id == transaction.id }
-        if (index != -1) {
-            transactions[index] = transaction
-            saveAllTransactions(transactions)
-        }
+        saveTransactions(transactions)
     }
 
     fun deleteTransaction(transactionId: Long) {
         val transactions = getAllTransactions().toMutableList()
         transactions.removeAll { it.id == transactionId }
-        saveAllTransactions(transactions)
+        saveTransactions(transactions)
+    }
+
+    fun updateTransaction(updatedTransaction: Transaction) {
+        val transactions = getAllTransactions().toMutableList()
+        val index = transactions.indexOfFirst { it.id == updatedTransaction.id }
+        if (index != -1) {
+            transactions[index] = updatedTransaction
+            saveTransactions(transactions)
+        }
     }
 
     fun getAllTransactions(): List<Transaction> {
-        val json = sharedPreferences.getString(KEY_TRANSACTIONS, "[]")
-        val type = object : TypeToken<List<Transaction>>() {}.type
-        return gson.fromJson(json, type) ?: emptyList()
+        val transactionsJson = sharedPreferences.getString("transactions", "[]")
+        return parseTransactionsFromJson(JSONArray(transactionsJson))
     }
 
-    private fun saveAllTransactions(transactions: List<Transaction>) {
-        val json = gson.toJson(transactions)
-        sharedPreferences.edit().putString(KEY_TRANSACTIONS, json).apply()
+    fun getAllTransactionsJson(): JSONArray {
+        val transactions = getAllTransactions()
+        val jsonArray = JSONArray()
+        
+        for (transaction in transactions) {
+            val jsonObject = JSONObject().apply {
+                put("title", transaction.title)
+                put("amount", transaction.amount)
+                put("date", transaction.date.time)
+                put("type", transaction.type.name)
+                put("category", transaction.category?.name)
+            }
+            jsonArray.put(jsonObject)
+        }
+        
+        return jsonArray
     }
 
-    fun setCurrency(currency: String) {
-        sharedPreferences.edit().putString(KEY_CURRENCY, currency).apply()
+    fun restoreTransactionsFromJson(jsonArray: JSONArray) {
+        val transactions = parseTransactionsFromJson(jsonArray)
+        saveTransactions(transactions)
+    }
+
+    private fun parseTransactionsFromJson(jsonArray: JSONArray): List<Transaction> {
+        val transactions = mutableListOf<Transaction>()
+        
+        for (i in 0 until jsonArray.length()) {
+            val jsonObject = jsonArray.getJSONObject(i)
+            val transaction = Transaction(
+                title = jsonObject.getString("title"),
+                amount = jsonObject.getDouble("amount"),
+                date = Date(jsonObject.getLong("date")),
+                type = TransactionType.valueOf(jsonObject.getString("type")),
+                category = if (!jsonObject.isNull("category")) 
+                    ExpenseCategory.valueOf(jsonObject.getString("category")) 
+                else null
+            )
+            transactions.add(transaction)
+        }
+        
+        return transactions
+    }
+
+    private fun saveTransactions(transactions: List<Transaction>) {
+        val jsonArray = JSONArray()
+        transactions.forEach { transaction ->
+            val jsonObject = JSONObject().apply {
+                put("title", transaction.title)
+                put("amount", transaction.amount)
+                put("date", transaction.date.time)
+                put("type", transaction.type.name)
+                put("category", transaction.category?.name)
+            }
+            jsonArray.put(jsonObject)
+        }
+        
+        sharedPreferences.edit()
+            .putString("transactions", jsonArray.toString())
+            .apply()
     }
 
     fun getCurrency(): String {
-        return sharedPreferences.getString(KEY_CURRENCY, DEFAULT_CURRENCY) ?: DEFAULT_CURRENCY
+        return sharedPreferences.getString("currency", "LKR") ?: "LKR"
     }
 
-    fun setBudget(amount: Double) {
-        sharedPreferences.edit().putFloat(KEY_BUDGET, amount.toFloat()).apply()
+    fun setCurrency(currency: String) {
+        sharedPreferences.edit()
+            .putString("currency", currency)
+            .apply()
     }
 
     fun getBudget(): Double {
-        return sharedPreferences.getFloat(KEY_BUDGET, 0f).toDouble()
+        return sharedPreferences.getFloat("budget", 0f).toDouble()
+    }
+
+    fun setBudget(amount: Double) {
+        sharedPreferences.edit()
+            .putFloat("budget", amount.toFloat())
+            .apply()
     }
 } 
