@@ -57,16 +57,49 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
+    <androidx.cardview.widget.CardView
+        android:id="@+id/chartCard"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        app:layout_constraintBottom_toTopOf="@id/addIncomeButton"
+        app:layout_constraintTop_toBottomOf="@id/summaryCard">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Expense Distribution"
+                android:textAlignment="center"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/pieChart"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="8dp" />
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/addIncomeButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:text="Add Income"
+        app:layout_constraintBottom_toTopOf="@id/viewTransactionsButton"
         app:layout_constraintEnd_toStartOf="@+id/addExpenseButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/summaryCard" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/addExpenseButton"
@@ -74,24 +107,25 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="Add Expense"
+        app:layout_constraintBottom_toTopOf="@id/viewTransactionsButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/addIncomeButton"
-        app:layout_constraintTop_toTopOf="@+id/addIncomeButton" />
+        app:layout_constraintStart_toEndOf="@+id/addIncomeButton" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/viewTransactionsButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:text="View Transactions"
-        app:layout_constraintTop_toBottomOf="@id/addIncomeButton" />
+        app:layout_constraintBottom_toTopOf="@id/settingsButton" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/settingsButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"
         android:text="Settings"
-        app:layout_constraintTop_toBottomOf="@id/viewTransactionsButton" />
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

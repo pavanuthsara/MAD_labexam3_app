@@ -6,6 +6,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -19,6 +20,11 @@ import com.example.mad_labexam3_app.models.ExpenseCategory
 import com.example.mad_labexam3_app.models.Transaction
 import com.example.mad_labexam3_app.models.TransactionType
 import com.example.mad_labexam3_app.utils.TransactionManager
+import com.github.mikephil.charting.data.PieData
+import com.github.mikephil.charting.data.PieDataSet
+import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.formatter.PercentFormatter
+import com.github.mikephil.charting.utils.ColorTemplate
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -35,7 +41,73 @@ class MainActivity : AppCompatActivity() {
         transactionManager = TransactionManager(this)
         createNotificationChannel()
         setupClickListeners()
+        setupPieChart()
         updateSummary()
+    }
+
+    private fun setupPieChart() {
+        binding.pieChart.apply {
+            description.isEnabled = false
+            isDrawHoleEnabled = true
+            setHoleColor(Color.WHITE)
+            setTransparentCircleColor(Color.WHITE)
+            setTransparentCircleAlpha(110)
+            holeRadius = 58f
+            transparentCircleRadius = 61f
+            setDrawCenterText(true)
+            rotationAngle = 0f
+            isRotationEnabled = true
+            isHighlightPerTapEnabled = true
+            setUsePercentValues(true)
+            legend.isEnabled = true
+        }
+    }
+
+    private fun updatePieChart() {
+        val transactions = transactionManager.getAllTransactions()
+        val expensesByCategory = transactions
+            .filter { it.type == TransactionType.EXPENSE }
+            .groupBy { it.category }
+            .mapValues { it.value.sumOf { transaction -> transaction.amount } }
+
+        val entries = ArrayList<PieEntry>()
+        val colors = ArrayList<Int>()
+
+        expensesByCategory.forEach { (category, amount) ->
+            if (category != null && amount > 0) {
+                entries.add(PieEntry(amount.toFloat(), category.name))
+                colors.add(getCategoryColor(category))
+            }
+        }
+
+        if (entries.isEmpty()) {
+            binding.pieChart.setNoDataText("No expense data available")
+            binding.pieChart.invalidate()
+            return
+        }
+
+        val dataSet = PieDataSet(entries, "Expenses by Category")
+        dataSet.colors = colors
+        dataSet.sliceSpace = 3f
+        dataSet.selectionShift = 5f
+
+        val data = PieData(dataSet)
+        data.setValueFormatter(PercentFormatter(binding.pieChart))
+        data.setValueTextSize(11f)
+        data.setValueTextColor(Color.WHITE)
+
+        binding.pieChart.data = data
+        binding.pieChart.highlightValues(null)
+        binding.pieChart.invalidate()
+    }
+
+    private fun getCategoryColor(category: ExpenseCategory): Int {
+        return when (category) {
+            ExpenseCategory.BILL -> Color.rgb(255, 123, 123)
+            ExpenseCategory.EDUCATION -> Color.rgb(123, 123, 255)
+            ExpenseCategory.TRANSPORTATION -> Color.rgb(123, 255, 123)
+            ExpenseCategory.FOOD -> Color.rgb(255, 187, 123)
+        }
     }
 
     private fun setupClickListeners() {
@@ -126,6 +198,8 @@ class MainActivity : AppCompatActivity() {
         binding.balanceText.text = "Balance: $currency %.2f".format(balance)
         binding.incomeText.text = "Income: $currency %.2f".format(totalIncome)
         binding.expenseText.text = "Expenses: $currency %.2f".format(totalExpenses)
+
+        updatePieChart()
     }
 
     private fun checkBudget() {
