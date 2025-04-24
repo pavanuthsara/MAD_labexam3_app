@@ -6,6 +6,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.mad_labexam3_app.databinding.ActivitySettingsBinding
 import com.example.mad_labexam3_app.utils.TransactionManager
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
@@ -46,6 +51,39 @@ class SettingsActivity : AppCompatActivity() {
 
             Toast.makeText(this, "Settings saved", Toast.LENGTH_SHORT).show()
             finish()
+        }
+
+        // Setup backup button
+        binding.button6.setOnClickListener {
+            performBackup()
+        }
+    }
+
+    private fun performBackup() {
+        try {
+            // Create backup data
+            val backupData = JsonObject().apply {
+                addProperty("currency", transactionManager.getCurrency())
+                addProperty("budget", transactionManager.getBudget())
+                add("transactions", Gson().toJsonTree(transactionManager.getAllTransactions()))
+            }
+
+            // Create documents directory if it doesn't exist
+            val documentsDir = File(getExternalFilesDir(null), "Documents")
+            if (!documentsDir.exists()) {
+                documentsDir.mkdirs()
+            }
+
+            // Create backup file with timestamp
+            val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+            val backupFile = File(documentsDir, "expense_tracker_backup_$timestamp.json")
+            
+            // Write data to file
+            backupFile.writeText(backupData.toString())
+            
+            Toast.makeText(this, "Backup saved to: ${backupFile.path}", Toast.LENGTH_LONG).show()
+        } catch (e: Exception) {
+            Toast.makeText(this, "Backup failed: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 } 
