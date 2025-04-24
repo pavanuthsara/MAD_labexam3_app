@@ -147,7 +147,15 @@ class MainActivity : AppCompatActivity() {
                 { _, year, month, day ->
                     calendar.set(year, month, day)
                     selectedDate = calendar.time
-                    dateEdit.setText(dateFormat.format(selectedDate))
+                    if (calendar.time.after(Date())) {
+                        // Don't allow future dates
+                        dateEdit.error = "Future dates are not allowed"
+                        selectedDate = Date()
+                        dateEdit.setText(dateFormat.format(selectedDate))
+                    } else {
+                        dateEdit.error = null
+                        dateEdit.setText(dateFormat.format(selectedDate))
+                    }
                 },
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH),
@@ -155,19 +163,39 @@ class MainActivity : AppCompatActivity() {
             ).show()
         }
 
-        AlertDialog.Builder(this)
+        val dialog = AlertDialog.Builder(this)
             .setTitle(if (type == TransactionType.INCOME) "Add Income" else "Add Expense")
             .setView(dialogView)
-            .setPositiveButton("Add") { _, _ ->
-                val title = titleEdit.text.toString()
-                val amount = amountEdit.text.toString().toDoubleOrNull() ?: 0.0
+            .setPositiveButton("Add", null)
+            .setNegativeButton("Cancel", null)
+            .create()
+
+        dialog.setOnShowListener {
+            val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            positiveButton.setOnClickListener {
+                // Validate title
+                if (titleEdit.text.toString().trim().isEmpty()) {
+                    titleEdit.error = "Title is required"
+                    return@setOnClickListener
+                }
+
+                // Validate amount
+                val amountStr = amountEdit.text.toString()
+                when {
+                    amountStr.isEmpty() -> {
+                        amountEdit.error = "Amount is required"
+                        return@setOnClickListener
+                    }
+                }
+
+                // All validations passed, create and save transaction
                 val category = if (type == TransactionType.EXPENSE) 
                     ExpenseCategory.values()[categorySpinner.selectedItemPosition] 
                 else null
 
                 val transaction = Transaction(
-                    title = title,
-                    amount = amount,
+                    title = titleEdit.text.toString().trim(),
+                    amount = amountStr.toDouble(),
                     date = selectedDate,
                     type = type,
                     category = category
@@ -176,9 +204,11 @@ class MainActivity : AppCompatActivity() {
                 transactionManager.saveTransaction(transaction)
                 updateSummary()
                 checkBudget()
+                dialog.dismiss()
             }
-            .setNegativeButton("Cancel", null)
-            .show()
+        }
+
+        dialog.show()
     }
 
     private fun updateSummary() {
