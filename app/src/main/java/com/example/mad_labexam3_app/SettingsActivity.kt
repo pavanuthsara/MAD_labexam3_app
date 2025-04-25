@@ -61,11 +61,13 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun setupViews() {
         // Setup currency spinner
-        binding.currencySpinner.adapter = ArrayAdapter(
+        val spinnerAdapter = ArrayAdapter(
             this,
-            android.R.layout.simple_spinner_dropdown_item,
+            R.layout.spinner_item,
             currencies
         )
+        spinnerAdapter.setDropDownViewResource(R.layout.spinner_item)
+        binding.currencySpinner.adapter = spinnerAdapter
 
         // Set current values
         val currentCurrency = transactionManager.getCurrency()

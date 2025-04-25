@@ -2,69 +2,87 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#081523"
-    android:backgroundTint="#081523"
     android:orientation="vertical"
+    android:background="#081523"
     android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Settings"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="24dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Monthly Budget"
+        android:textSize="16sp"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="8dp" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:backgroundTint="#1e2f39"
         android:layout_marginBottom="16dp">
 
         <EditText
             android:id="@+id/budgetEdit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#FFFFFF"
-            android:backgroundTint="@color/white"
-            android:drawableTint="#FFFFFF"
-            android:foregroundTint="@color/white"
-            android:hint="Budget Amount"
+            android:hint="Enter budget"
             android:inputType="numberDecimal"
-            android:shadowColor="@color/white"
             android:textColor="#FFFFFF"
-            android:textColorHighlight="#FFFFFF"
-            android:textColorHint="#FFFFFF"
-            android:textColorLink="#FFFFFF" />
+            android:textColorHint="#7D7D7D"
+            android:backgroundTint="#1e2f39" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:text="Currency"
+        android:textSize="16sp"
         android:textColor="#FFFFFF"
-        android:textSize="16sp" />
+        android:layout_marginBottom="8dp" />
 
     <Spinner
         android:id="@+id/currencySpinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:backgroundTint="#FFFFFF"
-        android:minHeight="48dp" />
+        android:layout_marginBottom="32dp"
+        android:backgroundTint="#000000"
+        android:minHeight="48dp"
+        android:popupBackground="#000000"
+        android:spinnerMode="dropdown" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/saveButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="#4571fe"
-        android:text="Save Settings" />
+        android:text="Save Settings"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="16dp" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/button6"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="#4571fe"
-        android:text="Backup" />
+        android:text="Backup"
+        android:textColor="#FFFFFF"
+        android:layout_marginBottom="16dp" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/button7"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="#4571fe"
-        android:text="Restore" />
+        android:text="Restore"
+        android:textColor="#FFFFFF" />
 
 </LinearLayout> 
