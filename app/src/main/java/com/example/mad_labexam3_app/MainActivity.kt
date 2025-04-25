@@ -169,27 +169,48 @@ class MainActivity : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle(if (type == TransactionType.INCOME) "Add Income" else "Add Expense")
             .setView(dialogView)
-            .setPositiveButton("Add") { _, _ ->
-                val title = titleEdit.text.toString()
-                val amount = amountEdit.text.toString().toDoubleOrNull() ?: 0.0
-                val category = if (type == TransactionType.EXPENSE)
-                    ExpenseCategory.values()[categorySpinner.selectedItemPosition]
-                else null
-
-                val transaction = Transaction(
-                    title = title,
-                    amount = amount,
-                    date = selectedDate,
-                    type = type,
-                    category = category
-                )
-
-                transactionManager.saveTransaction(transaction)
-                updateSummary()
-                checkBudget()
-            }
+            .setPositiveButton("Add", null)
             .setNegativeButton("Cancel", null)
-            .show()
+            .create()
+            .apply {
+                setOnShowListener { dialog ->
+                    val button = (dialog as AlertDialog).getButton(AlertDialog.BUTTON_POSITIVE)
+                    button.setOnClickListener {
+                        val title = titleEdit.text.toString()
+                        val amountText = amountEdit.text.toString()
+                        
+                        // Validate inputs without dismissing the dialog
+                        if (title.isBlank()) {
+                            titleEdit.error = "Please enter a title"
+                            return@setOnClickListener
+                        }
+                        
+                        val amount = amountText.toDoubleOrNull()
+                        if (amount == null || amount <= 0) {
+                            amountEdit.error = "Please enter a valid amount"
+                            return@setOnClickListener
+                        }
+                        
+                        val category = if (type == TransactionType.EXPENSE)
+                            ExpenseCategory.values()[categorySpinner.selectedItemPosition]
+                        else null
+
+                        val transaction = Transaction(
+                            title = title,
+                            amount = amount,
+                            date = selectedDate,
+                            type = type,
+                            category = category
+                        )
+
+                        transactionManager.saveTransaction(transaction)
+                        updateSummary()
+                        checkBudget()
+                        dismiss()  // Dismiss dialog only when validation passes
+                    }
+                }
+                show()
+            }
     }
 
     private fun updateSummary() {
