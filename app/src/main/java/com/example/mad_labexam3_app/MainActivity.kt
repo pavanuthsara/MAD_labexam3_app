@@ -13,8 +13,10 @@ import android.view.LayoutInflater
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Spinner
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.example.mad_labexam3_app.databinding.ActivityMainBinding
 import com.example.mad_labexam3_app.models.ExpenseCategory
 import com.example.mad_labexam3_app.models.Transaction
@@ -161,8 +163,8 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton("Add") { _, _ ->
                 val title = titleEdit.text.toString()
                 val amount = amountEdit.text.toString().toDoubleOrNull() ?: 0.0
-                val category = if (type == TransactionType.EXPENSE) 
-                    ExpenseCategory.values()[categorySpinner.selectedItemPosition] 
+                val category = if (type == TransactionType.EXPENSE)
+                    ExpenseCategory.values()[categorySpinner.selectedItemPosition]
                 else null
 
                 val transaction = Transaction(
@@ -200,6 +202,7 @@ class MainActivity : AppCompatActivity() {
         binding.expenseText.text = "Expenses: $currency %.2f".format(totalExpenses)
 
         updatePieChart()
+        checkBudget()
     }
 
     private fun checkBudget() {
@@ -228,15 +231,36 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showBudgetWarningNotification() {
-        val notification = NotificationCompat.Builder(this, "budget_warning")
+        // Compute dynamic content
+        val budget = transactionManager.getBudget()
+        val totalExpenses = transactionManager.getAllTransactions()
+            .filter { it.type == TransactionType.EXPENSE }
+            .sumOf { it.amount }
+        val currency = transactionManager.getCurrency()
+        val contentText = "You have spent $currency %.2f, exceeding your budget of $currency %.2f".format(
+            totalExpenses, budget
+        )
+
+        // Intent to open app
+        val intent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        val pendingFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        } else PendingIntent.FLAG_UPDATE_CURRENT
+        val pendingIntent = PendingIntent.getActivity(this, 0, intent, pendingFlags)
+
+        // Build notification
+        val builder = NotificationCompat.Builder(this, "budget_warning")
             .setSmallIcon(android.R.drawable.ic_dialog_alert)
             .setContentTitle("Budget Warning")
-            .setContentText("Your expenses have exceeded the budget!")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .build()
+            .setContentText(contentText)
+            .setAutoCancel(true)
+            .setContentIntent(pendingIntent)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
 
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(1, notification)
+        // Show notification
+        NotificationManagerCompat.from(this).notify(1, builder.build())
     }
 
     override fun onResume() {
