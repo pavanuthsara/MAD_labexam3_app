@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp"
-    android:background="#081523">
+>
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
@@ -16,6 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Title"
+            android:textColor="@color/black"
             android:inputType="text" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -29,6 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Amount"
+            android:textColor="@color/black"
             android:inputType="numberDecimal" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -43,6 +45,7 @@
             android:layout_height="wrap_content"
             android:hint="Date"
             android:focusable="false"
+            android:textColor="@color/black"
             android:clickable="true" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -50,6 +53,8 @@
         android:id="@+id/categorySpinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="8dp"
+        android:minHeight="48dp"
+        android:backgroundTint="@color/white"/>
 
 </LinearLayout> 
