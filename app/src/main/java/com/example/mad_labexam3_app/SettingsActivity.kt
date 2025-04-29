@@ -216,7 +216,7 @@ class SettingsActivity : AppCompatActivity() {
             // Restore transactions
             val transactionsJson = gson.toJson(backupData["transactions"])
             val transactionsType = object : TypeToken<List<Transaction>>() {}.type
-            val transactions: List<Transaction> = gson.fromJson(transactionsJson, transactionsType)
+            val restoredTransactions: List<Transaction> = gson.fromJson(transactionsJson, transactionsType)
             
             // Restore currency
             val currency = backupData["currency"] as? String
@@ -230,14 +230,25 @@ class SettingsActivity : AppCompatActivity() {
             }
             transactionManager.setBudget(budget)
             
-            // Clear existing transactions and add restored ones
-            transactions.forEach { transaction ->
+            // Get existing transactions
+            val existingTransactions = transactionManager.getAllTransactions()
+            val existingIds = existingTransactions.map { it.id }
+            
+            // Filter out transactions that already exist
+            val newTransactions = restoredTransactions.filter { transaction ->
+                !existingIds.contains(transaction.id)
+            }
+            
+            // Add only new transactions
+            var restoredCount = 0
+            newTransactions.forEach { transaction ->
                 transactionManager.saveTransaction(transaction)
+                restoredCount++
             }
 
             Toast.makeText(
                 this,
-                "Data restored successfully",
+                "Restored $restoredCount new transactions successfully",
                 Toast.LENGTH_SHORT
             ).show()
 
